@@ -1,0 +1,24 @@
+{
+    "name": "logo-generator",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+      "example": "examples",
+      "lib": "lib"
+    },
+    "scripts": {
+      "test": "jest"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "inquirer": "^8.1.2",
+      "fs": "^0.0.1-security",
+      "svg.js": "^2.7.1"
+    },
+    "devDependencies": {
+      "jest": "^26.5.2"
+    }
+  }
