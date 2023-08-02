@@ -1,49 +1,72 @@
-const fs = require("fs");
-const { create } = require("svg.js");
+const { Shape, Triangle, Circle, Square } = require("./lib/shape");
 const inquirer = require("inquirer");
+const fs = require("fs");
 
-const generateLogo = async (logoName) => {
-  const canvas = create().size(400, 200);
+const questions = [
+  {
+    type: "input",
+    name: "text",
+    message: "Enter up to three characters for logo:",
+    validate: (input) => input.length <= 3,
+  },
+  {
+    type: "list",
+    name: "textColor",
+    message: "Enter text color:",
+    choices: ["white", "black", "gray"],
+  },
+  {
+    type: "list",
+    name: "shape",
+    message: "Choose a shape:",
+    choices: ["Triangle", "Circle", "Square"],
+  },
+  {
+    type: "input",
+    name: "shapeColor",
+    message: "Enter shape color (keyword or hex):",
+  },
+];
 
-  canvas.rect(400, 200).fill("#4CAF50");
+inquirer.prompt(questions).then((answers) => {
+  const { text, textColor, shape, shapeColor } = answers;
+  const shapeObj = new Shape();
+  let svgEl = "";
 
-  canvas
-    .text(200, 100, logoName)
-    .font({
-      family: "Arial",
-      size: 48,
-      anchor: "middle",
-      leading: 1,
-    })
-    .fill("#ffffff");
+  shapeObj.setColor(shapeColor);
 
-  const svgContent = canvas.svg();
+  switch (shape) {
+    case "Triangle":
+      const triangle = new Triangle();
+      triangle.setColor(shapeColor);
+      svgEl = triangle.render();
+      break;
+    case "Circle":
+      const circle = new Circle();
+      circle.setColor(shapeColor);
+      svgEl = circle.render();
+      break;
+    case "Square":
+      const square = new Square();
+      square.setColor(shapeColor);
+      svgEl = square.render();
+      break;
+  }
 
-  fs.writeFile(`${logoName}.svg`, svgContent, (err) => {
-    if (err) {
-      console.error("Error while saving SVG:", err);
-    } else {
-      console.log(`Logo "${logoName}" has been saved as ${logoName}.svg`);
-    }
-  });
-};
+  let x = 150,
+    y = 120;
+  if (shape === "Triangle") {
+    y = 135;
+  } else if (shape === "Square") {
+    y = 145;
+  }
 
-inquirer
-  .prompt([
-    {
-      type: "input",
-      name: "logoName",
-      message: "Enter the logo name:",
-    },
-  ])
-  .then((answers) => {
-    const logoName = answers.logoName.trim();
-    if (logoName === "") {
-      console.error("Logo name cannot be empty.");
-      process.exit(1);
-    }
-    generateLogo(logoName);
-  })
-  .catch((error) => {
-    console.error("Error occurred:", error);
-  });
+  const finalSvg = `<svg xmlns="https://www.w3.org/2000/svg" width="300" height="200">
+  ${svgEl}
+  <text x="${x}" y="${y}" fill="${textColor}" font-size="50" text-anchor="middle">${text}</text>
+  </svg>`;
+
+  fs.writeFileSync("logo.svg", finalSvg);
+
+  console.log("Generated logo.svg");
+});
